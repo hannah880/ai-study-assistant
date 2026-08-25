@@ -9,9 +9,11 @@ app = FastAPI()
 
 client = Client(host="http://localhost:11434")
 
-# Stores PDF chunks and their embeddings
+# Stores information from all uploaded PDFs
 uploaded_chunks = []
 chunk_embeddings = []
+chunk_sources = []
+uploaded_documents = []
 
 
 class QuestionRequest(BaseModel):
@@ -55,11 +57,11 @@ def cosine_similarity(vector1, vector2):
 @app.post("/upload")
 async def upload_pdf(file: UploadFile = File(...)):
 
-    global uploaded_chunks
-    global chunk_embeddings
-
     if not file.filename or not file.filename.lower().endswith(".pdf"):
         return {"error": "Please upload a PDF file."}
+
+    if file.filename in uploaded_documents:
+        return {"error": "This document has already been uploaded."}
 
     contents = await file.read()
 
@@ -76,22 +78,39 @@ async def upload_pdf(file: UploadFile = File(...)):
     if not text.strip():
         return {"error": "No text could be extracted from this PDF."}
 
-    # Split the PDF into smaller sections
-    uploaded_chunks = split_text(text)
+    new_chunks = split_text(text)
 
-    # Create embeddings for all sections
     embedding_response = client.embed(
         model="embeddinggemma",
-        input=uploaded_chunks
+        input=new_chunks
     )
 
-    chunk_embeddings = embedding_response.embeddings
+    new_embeddings = embedding_response.embeddings
+
+    # Add the new document instead of replacing existing documents
+    uploaded_chunks.extend(new_chunks)
+    chunk_embeddings.extend(new_embeddings)
+
+    for chunk in new_chunks:
+        chunk_sources.append(file.filename)
+
+    uploaded_documents.append(file.filename)
 
     return {
         "filename": file.filename,
         "characters_extracted": len(text),
-        "chunks_created": len(uploaded_chunks),
-        "message": "PDF processed and indexed successfully."
+        "chunks_created": len(new_chunks),
+        "documents_loaded": len(uploaded_documents),
+        "message": "PDF processed and added successfully."
+    }
+
+
+@app.get("/documents")
+def get_documents():
+    return {
+        "documents": uploaded_documents,
+        "total_documents": len(uploaded_documents),
+        "total_chunks": len(uploaded_chunks)
     }
 
 
@@ -103,7 +122,6 @@ def ask_question(request: QuestionRequest):
             "error": "Please upload your study notes before asking a question."
         }
 
-    # Create an embedding for the student's question
     question_response = client.embed(
         model="embeddinggemma",
         input=request.question
@@ -111,7 +129,6 @@ def ask_question(request: QuestionRequest):
 
     question_embedding = question_response.embeddings[0]
 
-    # Compare the question with every PDF chunk
     similarities = []
 
     for index, embedding in enumerate(chunk_embeddings):
@@ -123,16 +140,26 @@ def ask_question(request: QuestionRequest):
 
         similarities.append((score, index))
 
-    # Sort highest similarity first
     similarities.sort(reverse=True)
 
-    # Get the 3 most relevant chunks
-    top_chunks = []
+    # Retrieve the four most relevant pieces of notes
+    top_results = similarities[:4]
 
-    for score, index in similarities[:3]:
-        top_chunks.append(uploaded_chunks[index])
+    context_parts = []
+    sources = []
 
-    context = "\n\n---\n\n".join(top_chunks)
+    for score, index in top_results:
+        source = chunk_sources[index]
+        chunk = uploaded_chunks[index]
+
+        context_parts.append(
+            f"Source: {source}\n{chunk}"
+        )
+
+        if source not in sources:
+            sources.append(source)
+
+    context = "\n\n---\n\n".join(context_parts)
 
     prompt = f"""
 Use ONLY the study notes below to answer the student's question.
@@ -168,5 +195,6 @@ STUDENT QUESTION:
 
     return {
         "question": request.question,
-        "answer": response.message.content
+        "answer": response.message.content,
+        "sources": sources
     }
