@@ -17,6 +17,9 @@ chunk_embeddings = []
 chunk_sources = []
 uploaded_documents = []
 
+# Stores the most recently generated quiz
+latest_quiz = None
+
 
 # -------------------------
 # Request / response models
@@ -41,6 +44,10 @@ class QuizQuestion(BaseModel):
 class QuizResponse(BaseModel):
     topic: str
     questions: list[QuizQuestion]
+
+
+class QuizSubmission(BaseModel):
+    answers: list[str]
 
 
 # -------------------------
@@ -321,6 +328,8 @@ def generate_quiz(
         request: QuizRequest
 ):
 
+    global latest_quiz
+
     if not uploaded_chunks:
         return {
             "error": (
@@ -421,4 +430,66 @@ STUDY NOTES:
         response.message.content
     )
 
+    # Save the quiz so it can be marked later
+    latest_quiz = quiz
+
     return quiz
+
+
+# -------------------------
+# Submit quiz answers
+# -------------------------
+
+@app.post("/quiz/submit")
+def submit_quiz(
+        submission: QuizSubmission
+):
+
+    if latest_quiz is None:
+        return {
+            "error": "Please generate a quiz first."
+        }
+
+    if len(submission.answers) != len(latest_quiz.questions):
+        return {
+            "error": "Please submit an answer for every question."
+        }
+
+    score = 0
+    results = []
+
+    for index, question in enumerate(
+            latest_quiz.questions
+    ):
+
+        student_answer = (
+            submission.answers[index]
+        )
+
+        is_correct = (
+                student_answer.strip().lower()
+                ==
+                question.correct_answer.strip().lower()
+        )
+
+        if is_correct:
+            score += 1
+
+        results.append({
+            "question": question.question,
+            "your_answer": student_answer,
+            "correct_answer": question.correct_answer,
+            "correct": is_correct,
+            "explanation": question.explanation
+        })
+
+    percentage = (
+                         score / len(latest_quiz.questions)
+                 ) * 100
+
+    return {
+        "score": score,
+        "total": len(latest_quiz.questions),
+        "percentage": round(percentage, 1),
+        "results": results
+    }
