@@ -50,6 +50,21 @@ class QuizSubmission(BaseModel):
     answers: list[str]
 
 
+class FlashcardRequest(BaseModel):
+    topic: str
+    number_of_flashcards: int = Field(default=5, ge=1, le=15)
+
+
+class Flashcard(BaseModel):
+    front: str
+    back: str
+
+
+class FlashcardResponse(BaseModel):
+    topic: str
+    flashcards: list[Flashcard]
+
+
 # -------------------------
 # Home
 # -------------------------
@@ -226,7 +241,6 @@ def ask_question(
             )
         }
 
-    # Embed the student's question
     question_response = client.embed(
         model="embeddinggemma",
         input=request.question
@@ -238,7 +252,6 @@ def ask_question(
 
     similarities = []
 
-    # Compare question with every chunk
     for index, embedding in enumerate(
             chunk_embeddings
     ):
@@ -252,12 +265,10 @@ def ask_question(
             (score, index)
         )
 
-    # Highest similarity first
     similarities.sort(
         reverse=True
     )
 
-    # Retrieve top 4 chunks
     top_results = similarities[:4]
 
     context_parts = []
@@ -338,7 +349,6 @@ def generate_quiz(
             )
         }
 
-    # Find notes relevant to the topic
     topic_response = client.embed(
         model="embeddinggemma",
         input=request.topic
@@ -367,7 +377,6 @@ def generate_quiz(
         reverse=True
     )
 
-    # Use 5 most relevant chunks
     top_results = similarities[:5]
 
     context_parts = []
@@ -430,7 +439,6 @@ STUDY NOTES:
         response.message.content
     )
 
-    # Save the quiz so it can be marked later
     latest_quiz = quiz
 
     return quiz
@@ -493,3 +501,119 @@ def submit_quiz(
         "percentage": round(percentage, 1),
         "results": results
     }
+
+
+# -------------------------
+# Generate AI flashcards
+# -------------------------
+
+@app.post("/flashcards")
+def generate_flashcards(
+        request: FlashcardRequest
+):
+
+    if not uploaded_chunks:
+        return {
+            "error": (
+                "Please upload your study notes "
+                "before generating flashcards."
+            )
+        }
+
+    # Find chunks relevant to the requested topic
+    topic_response = client.embed(
+        model="embeddinggemma",
+        input=request.topic
+    )
+
+    topic_embedding = (
+        topic_response.embeddings[0]
+    )
+
+    similarities = []
+
+    for index, embedding in enumerate(
+            chunk_embeddings
+    ):
+
+        score = cosine_similarity(
+            topic_embedding,
+            embedding
+        )
+
+        similarities.append(
+            (score, index)
+        )
+
+    similarities.sort(
+        reverse=True
+    )
+
+    # Use the five most relevant chunks
+    top_results = similarities[:5]
+
+    context_parts = []
+
+    for score, index in top_results:
+        context_parts.append(
+            uploaded_chunks[index]
+        )
+
+    context = "\n\n---\n\n".join(
+        context_parts
+    )
+
+    prompt = f"""
+Create study flashcards using ONLY the study notes below.
+
+Topic:
+{request.topic}
+
+Create exactly:
+{request.number_of_flashcards} flashcards.
+
+Each flashcard must contain:
+
+Front:
+A clear question or key term.
+
+Back:
+A concise answer or explanation.
+
+Only use information found in the supplied study notes.
+
+Return the topic as:
+{request.topic}
+
+STUDY NOTES:
+
+{context}
+"""
+
+    response = client.chat(
+        model="llama3.2:3b",
+        messages=[
+            {
+                "role": "system",
+                "content": (
+                    "You are an educational flashcard generator. "
+                    "Create clear and accurate flashcards "
+                    "using only the provided study notes."
+                )
+            },
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ],
+        format=FlashcardResponse.model_json_schema(),
+        options={
+            "temperature": 0
+        }
+    )
+
+    flashcards = FlashcardResponse.model_validate_json(
+        response.message.content
+    )
+
+    return flashcards
