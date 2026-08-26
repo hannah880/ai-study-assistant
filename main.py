@@ -5,10 +5,20 @@ from pypdf import PdfReader
 from io import BytesIO
 import math
 
+from database import (
+    create_tables,
+    save_quiz_result,
+    get_quiz_results
+)
+
 
 app = FastAPI()
 
 client = Client(host="http://localhost:11434")
+
+
+# Create database tables when the app starts
+create_tables()
 
 
 # Stores information from uploaded PDFs
@@ -31,7 +41,11 @@ class QuestionRequest(BaseModel):
 
 class QuizRequest(BaseModel):
     topic: str
-    number_of_questions: int = Field(default=5, ge=1, le=10)
+    number_of_questions: int = Field(
+        default=5,
+        ge=1,
+        le=10
+    )
 
 
 class QuizQuestion(BaseModel):
@@ -52,7 +66,11 @@ class QuizSubmission(BaseModel):
 
 class FlashcardRequest(BaseModel):
     topic: str
-    number_of_flashcards: int = Field(default=5, ge=1, le=15)
+    number_of_flashcards: int = Field(
+        default=5,
+        ge=1,
+        le=15
+    )
 
 
 class Flashcard(BaseModel):
@@ -71,6 +89,7 @@ class FlashcardResponse(BaseModel):
 
 @app.get("/")
 def home():
+
     return {
         "message": "AI Study Assistant backend is running"
     }
@@ -80,7 +99,11 @@ def home():
 # Helper functions
 # -------------------------
 
-def split_text(text, chunk_size=500, overlap=50):
+def split_text(
+        text,
+        chunk_size=500,
+        overlap=50
+):
 
     words = text.split()
 
@@ -102,19 +125,31 @@ def split_text(text, chunk_size=500, overlap=50):
     return chunks
 
 
-def cosine_similarity(vector1, vector2):
+def cosine_similarity(
+        vector1,
+        vector2
+):
 
     dot_product = sum(
         a * b
-        for a, b in zip(vector1, vector2)
+        for a, b in zip(
+            vector1,
+            vector2
+        )
     )
 
     magnitude1 = math.sqrt(
-        sum(a * a for a in vector1)
+        sum(
+            a * a
+            for a in vector1
+        )
     )
 
     magnitude2 = math.sqrt(
-        sum(b * b for b in vector2)
+        sum(
+            b * b
+            for b in vector2
+        )
     )
 
     if magnitude1 == 0 or magnitude2 == 0:
@@ -135,18 +170,24 @@ async def upload_pdf(
 ):
 
     if not file.filename:
+
         return {
             "error": "Please upload a PDF file."
         }
 
     if not file.filename.lower().endswith(".pdf"):
+
         return {
             "error": "Please upload a PDF file."
         }
 
     if file.filename in uploaded_documents:
+
         return {
-            "error": "This document has already been uploaded."
+            "error": (
+                "This document has already "
+                "been uploaded."
+            )
         }
 
     contents = await file.read()
@@ -162,15 +203,24 @@ async def upload_pdf(
         page_text = page.extract_text()
 
         if page_text:
-            text += page_text + "\n"
+
+            text += (
+                    page_text + "\n"
+            )
 
     if not text.strip():
+
         return {
-            "error": "No text could be extracted from this PDF."
+            "error": (
+                "No text could be extracted "
+                "from this PDF."
+            )
         }
 
     # Split document into chunks
-    new_chunks = split_text(text)
+    new_chunks = split_text(
+        text
+    )
 
     # Generate embeddings
     embedding_response = client.embed(
@@ -182,17 +232,19 @@ async def upload_pdf(
         embedding_response.embeddings
     )
 
-    # Store chunks and embeddings
+    # Store chunks
     uploaded_chunks.extend(
         new_chunks
     )
 
+    # Store embeddings
     chunk_embeddings.extend(
         new_embeddings
     )
 
     # Remember which PDF each chunk came from
     for chunk in new_chunks:
+
         chunk_sources.append(
             file.filename
         )
@@ -205,8 +257,13 @@ async def upload_pdf(
         "filename": file.filename,
         "characters_extracted": len(text),
         "chunks_created": len(new_chunks),
-        "documents_loaded": len(uploaded_documents),
-        "message": "PDF processed and added successfully."
+        "documents_loaded": len(
+            uploaded_documents
+        ),
+        "message": (
+            "PDF processed and "
+            "added successfully."
+        )
     }
 
 
@@ -219,8 +276,12 @@ def get_documents():
 
     return {
         "documents": uploaded_documents,
-        "total_documents": len(uploaded_documents),
-        "total_chunks": len(uploaded_chunks)
+        "total_documents": len(
+            uploaded_documents
+        ),
+        "total_chunks": len(
+            uploaded_chunks
+        )
     }
 
 
@@ -234,6 +295,7 @@ def ask_question(
 ):
 
     if not uploaded_chunks:
+
         return {
             "error": (
                 "Please upload your study notes "
@@ -241,6 +303,7 @@ def ask_question(
             )
         }
 
+    # Generate embedding for the question
     question_response = client.embed(
         model="embeddinggemma",
         input=request.question
@@ -252,6 +315,7 @@ def ask_question(
 
     similarities = []
 
+    # Compare question with document chunks
     for index, embedding in enumerate(
             chunk_embeddings
     ):
@@ -262,32 +326,49 @@ def ask_question(
         )
 
         similarities.append(
-            (score, index)
+            (
+                score,
+                index
+            )
         )
 
+    # Highest similarity first
     similarities.sort(
         reverse=True
     )
 
-    top_results = similarities[:4]
+    # Retrieve top 4 chunks
+    top_results = (
+        similarities[:4]
+    )
 
     context_parts = []
     sources = []
 
     for score, index in top_results:
 
-        source = chunk_sources[index]
-        chunk = uploaded_chunks[index]
+        source = (
+            chunk_sources[index]
+        )
+
+        chunk = (
+            uploaded_chunks[index]
+        )
 
         context_parts.append(
             f"Source: {source}\n{chunk}"
         )
 
         if source not in sources:
-            sources.append(source)
 
-    context = "\n\n---\n\n".join(
-        context_parts
+            sources.append(
+                source
+            )
+
+    context = (
+        "\n\n---\n\n".join(
+            context_parts
+        )
     )
 
     prompt = f"""
@@ -325,7 +406,9 @@ STUDENT QUESTION:
 
     return {
         "question": request.question,
-        "answer": response.message.content,
+        "answer": (
+            response.message.content
+        ),
         "sources": sources
     }
 
@@ -342,6 +425,7 @@ def generate_quiz(
     global latest_quiz
 
     if not uploaded_chunks:
+
         return {
             "error": (
                 "Please upload your study notes "
@@ -349,6 +433,7 @@ def generate_quiz(
             )
         }
 
+    # Embed quiz topic
     topic_response = client.embed(
         model="embeddinggemma",
         input=request.topic
@@ -360,6 +445,7 @@ def generate_quiz(
 
     similarities = []
 
+    # Compare topic with chunks
     for index, embedding in enumerate(
             chunk_embeddings
     ):
@@ -370,24 +456,33 @@ def generate_quiz(
         )
 
         similarities.append(
-            (score, index)
+            (
+                score,
+                index
+            )
         )
 
     similarities.sort(
         reverse=True
     )
 
-    top_results = similarities[:5]
+    # Retrieve top 5 chunks
+    top_results = (
+        similarities[:5]
+    )
 
     context_parts = []
 
     for score, index in top_results:
+
         context_parts.append(
             uploaded_chunks[index]
         )
 
-    context = "\n\n---\n\n".join(
-        context_parts
+    context = (
+        "\n\n---\n\n".join(
+            context_parts
+        )
     )
 
     prompt = f"""
@@ -435,10 +530,14 @@ STUDY NOTES:
         }
     )
 
-    quiz = QuizResponse.model_validate_json(
-        response.message.content
+    quiz = (
+        QuizResponse.model_validate_json(
+            response.message.content
+        )
     )
 
+    # Save quiz temporarily
+    # so it can be marked
     latest_quiz = quiz
 
     return quiz
@@ -454,13 +553,25 @@ def submit_quiz(
 ):
 
     if latest_quiz is None:
+
         return {
-            "error": "Please generate a quiz first."
+            "error": (
+                "Please generate "
+                "a quiz first."
+            )
         }
 
-    if len(submission.answers) != len(latest_quiz.questions):
+    if (
+            len(submission.answers)
+            !=
+            len(latest_quiz.questions)
+    ):
+
         return {
-            "error": "Please submit an answer for every question."
+            "error": (
+                "Please submit an answer "
+                "for every question."
+            )
         }
 
     score = 0
@@ -481,25 +592,96 @@ def submit_quiz(
         )
 
         if is_correct:
+
             score += 1
 
         results.append({
-            "question": question.question,
-            "your_answer": student_answer,
-            "correct_answer": question.correct_answer,
-            "correct": is_correct,
-            "explanation": question.explanation
+            "question": (
+                question.question
+            ),
+            "your_answer": (
+                student_answer
+            ),
+            "correct_answer": (
+                question.correct_answer
+            ),
+            "correct": (
+                is_correct
+            ),
+            "explanation": (
+                question.explanation
+            )
         })
 
+    total = len(
+        latest_quiz.questions
+    )
+
     percentage = (
-                         score / len(latest_quiz.questions)
+                         score / total
                  ) * 100
 
+    percentage = round(
+        percentage,
+        1
+    )
+
+    # Save quiz result permanently
+    # inside SQLite
+    save_quiz_result(
+        topic=latest_quiz.topic,
+        score=score,
+        total=total,
+        percentage=percentage
+    )
+
     return {
+        "topic": latest_quiz.topic,
         "score": score,
-        "total": len(latest_quiz.questions),
-        "percentage": round(percentage, 1),
+        "total": total,
+        "percentage": percentage,
         "results": results
+    }
+
+
+# -------------------------
+# Progress tracking
+# -------------------------
+
+@app.get("/progress")
+def get_progress():
+
+    quiz_history = (
+        get_quiz_results()
+    )
+
+    if not quiz_history:
+
+        return {
+            "total_quizzes": 0,
+            "average_percentage": 0,
+            "quiz_history": []
+        }
+
+    total_percentage = sum(
+        result["percentage"]
+        for result in quiz_history
+    )
+
+    average_percentage = (
+            total_percentage
+            / len(quiz_history)
+    )
+
+    return {
+        "total_quizzes": len(
+            quiz_history
+        ),
+        "average_percentage": round(
+            average_percentage,
+            1
+        ),
+        "quiz_history": quiz_history
     }
 
 
@@ -513,6 +695,7 @@ def generate_flashcards(
 ):
 
     if not uploaded_chunks:
+
         return {
             "error": (
                 "Please upload your study notes "
@@ -520,7 +703,7 @@ def generate_flashcards(
             )
         }
 
-    # Find chunks relevant to the requested topic
+    # Embed requested topic
     topic_response = client.embed(
         model="embeddinggemma",
         input=request.topic
@@ -532,6 +715,7 @@ def generate_flashcards(
 
     similarities = []
 
+    # Compare topic with document chunks
     for index, embedding in enumerate(
             chunk_embeddings
     ):
@@ -542,25 +726,33 @@ def generate_flashcards(
         )
 
         similarities.append(
-            (score, index)
+            (
+                score,
+                index
+            )
         )
 
     similarities.sort(
         reverse=True
     )
 
-    # Use the five most relevant chunks
-    top_results = similarities[:5]
+    # Retrieve top 5 chunks
+    top_results = (
+        similarities[:5]
+    )
 
     context_parts = []
 
     for score, index in top_results:
+
         context_parts.append(
             uploaded_chunks[index]
         )
 
-    context = "\n\n---\n\n".join(
-        context_parts
+    context = (
+        "\n\n---\n\n".join(
+            context_parts
+        )
     )
 
     prompt = f"""
@@ -606,14 +798,18 @@ STUDY NOTES:
                 "content": prompt
             }
         ],
-        format=FlashcardResponse.model_json_schema(),
+        format=(
+            FlashcardResponse.model_json_schema()
+        ),
         options={
             "temperature": 0
         }
     )
 
-    flashcards = FlashcardResponse.model_validate_json(
-        response.message.content
+    flashcards = (
+        FlashcardResponse.model_validate_json(
+            response.message.content
+        )
     )
 
     return flashcards
