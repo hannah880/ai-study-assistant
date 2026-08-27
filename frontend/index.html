@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>AI Study Assistant</title>
+
+    <link
+            rel="stylesheet"
+            href="/static/styles.css"
+    >
+</head>
+
+<body>
+
+<div class="app-container">
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            <h2>StudyAI</h2>
+            <p>Your AI study assistant</p>
+        </div>
+
+        <nav>
+
+            <button
+                    class="nav-button active"
+                    data-section="upload-section"
+            >
+                Upload Notes
+            </button>
+
+            <button
+                    class="nav-button"
+                    data-section="ask-section"
+            >
+                Ask AI
+            </button>
+
+            <button
+                    class="nav-button"
+                    data-section="quiz-section"
+            >
+                Quiz
+            </button>
+
+            <button
+                    class="nav-button"
+                    data-section="flashcard-section"
+            >
+                Flashcards
+            </button>
+
+            <button
+                    class="nav-button"
+                    data-section="progress-section"
+            >
+                Progress
+            </button>
+
+        </nav>
+
+    </aside>
+
+
+    <main class="main-content">
+
+        <header>
+
+            <h1>AI Study Assistant</h1>
+
+            <p>
+                Upload your notes and study using
+                AI-powered questions, quizzes and flashcards.
+            </p>
+
+        </header>
+
+
+        <!-- Upload section -->
+
+        <section
+                id="upload-section"
+                class="page-section active-section"
+        >
+
+            <div class="card">
+
+                <h2>Upload Study Notes</h2>
+
+                <p>
+                    Upload a PDF and the AI will use
+                    your notes when answering questions.
+                </p>
+
+                <input
+                        type="file"
+                        id="pdf-file"
+                        accept=".pdf"
+                >
+
+                <button
+                        id="upload-button"
+                        class="primary-button"
+                >
+                    Upload PDF
+                </button>
+
+                <div
+                        id="upload-message"
+                        class="message"
+                ></div>
+
+            </div>
+
+
+            <div class="card">
+
+                <div class="section-heading">
+
+                    <h2>Uploaded Documents</h2>
+
+                    <button
+                            id="refresh-documents"
+                            class="secondary-button"
+                    >
+                        Refresh
+                    </button>
+
+                </div>
+
+                <div id="document-list">
+
+                    <p class="muted">
+                        No documents uploaded yet.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- Ask AI section -->
+
+        <section
+                id="ask-section"
+                class="page-section"
+        >
+
+            <div class="card">
+
+                <h2>Ask Your Notes</h2>
+
+                <p>
+                    Ask a question and the AI will
+                    retrieve relevant information from
+                    your uploaded PDFs.
+                </p>
+
+                <textarea
+                        id="question-input"
+                        placeholder="e.g. What is recursion?"
+                ></textarea>
+
+                <button
+                        id="ask-button"
+                        class="primary-button"
+                >
+                    Ask AI
+                </button>
+
+            </div>
+
+
+            <div
+                    id="answer-card"
+                    class="card hidden"
+            >
+
+                <h2>Answer</h2>
+
+                <div
+                        id="answer-output"
+                        class="answer-output"
+                ></div>
+
+                <div
+                        id="source-output"
+                        class="sources"
+                ></div>
+
+            </div>
+
+        </section>
+
+
+        <!-- Quiz section -->
+
+        <section
+                id="quiz-section"
+                class="page-section"
+        >
+
+            <div class="card">
+
+                <h2>Generate Quiz</h2>
+
+                <label for="quiz-topic">
+                    Topic
+                </label>
+
+                <input
+                        id="quiz-topic"
+                        type="text"
+                        placeholder="e.g. Recursion"
+                >
+
+                <label for="quiz-count">
+                    Number of questions
+                </label>
+
+                <input
+                        id="quiz-count"
+                        type="number"
+                        value="5"
+                        min="1"
+                        max="10"
+                >
+
+                <button
+                        id="generate-quiz"
+                        class="primary-button"
+                >
+                    Generate Quiz
+                </button>
+
+            </div>
+
+
+            <div
+                    id="quiz-container"
+                    class="hidden"
+            ></div>
+
+        </section>
+
+
+        <!-- Flashcards section -->
+
+        <section
+                id="flashcard-section"
+                class="page-section"
+        >
+
+            <div class="card">
+
+                <h2>Generate Flashcards</h2>
+
+                <label for="flashcard-topic">
+                    Topic
+                </label>
+
+                <input
+                        id="flashcard-topic"
+                        type="text"
+                        placeholder="e.g. Data Structures"
+                >
+
+                <label for="flashcard-count">
+                    Number of flashcards
+                </label>
+
+                <input
+                        id="flashcard-count"
+                        type="number"
+                        value="5"
+                        min="1"
+                        max="15"
+                >
+
+                <button
+                        id="generate-flashcards"
+                        class="primary-button"
+                >
+                    Generate Flashcards
+                </button>
+
+            </div>
+
+
+            <div
+                    id="flashcard-container"
+                    class="flashcard-grid"
+            ></div>
+
+        </section>
+
+
+        <!-- Progress section -->
+
+        <section
+                id="progress-section"
+                class="page-section"
+        >
+
+            <div class="section-heading">
+
+                <h2>Your Progress</h2>
+
+                <button
+                        id="refresh-progress"
+                        class="secondary-button"
+                >
+                    Refresh
+                </button>
+
+            </div>
+
+
+            <div class="stats-grid">
+
+                <div class="stat-card">
+
+                    <span>Total Quizzes</span>
+
+                    <strong id="total-quizzes">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <span>Average Score</span>
+
+                    <strong id="average-score">
+                        0%
+                    </strong>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <span>Strongest Topic</span>
+
+                    <strong id="strongest-topic">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <span>Weakest Topic</span>
+
+                    <strong id="weakest-topic">
+                        -
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="card">
+
+                <h2>Topic Performance</h2>
+
+                <div id="topic-progress">
+
+                    <p class="muted">
+                        Complete quizzes to see your progress.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="card">
+
+                <h2>Quiz History</h2>
+
+                <div id="quiz-history">
+
+                    <p class="muted">
+                        No quiz history yet.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<script src="/static/app.js"></script>
+
+</body>
+
+</html>

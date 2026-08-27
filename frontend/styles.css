@@ -1,0 +1,479 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f5f6fa;
+    color: #20232a;
+}
+
+
+button,
+input,
+textarea {
+    font: inherit;
+}
+
+
+.app-container {
+    min-height: 100vh;
+    display: flex;
+}
+
+
+/* Sidebar */
+
+.sidebar {
+    width: 240px;
+    background: #181c2e;
+    padding: 30px 20px;
+    min-height: 100vh;
+}
+
+
+.logo {
+    margin-bottom: 40px;
+}
+
+
+.logo h2 {
+    color: white;
+    font-size: 26px;
+}
+
+
+.logo p {
+    color: #aeb4c7;
+    margin-top: 6px;
+    font-size: 13px;
+}
+
+
+nav {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+
+.nav-button {
+    border: none;
+    background: transparent;
+    color: #c9cede;
+    text-align: left;
+    padding: 13px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+
+.nav-button:hover {
+    background: #252a42;
+}
+
+
+.nav-button.active {
+    background: #ffffff;
+    color: #181c2e;
+    font-weight: bold;
+}
+
+
+/* Main */
+
+.main-content {
+    flex: 1;
+    padding: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+
+header {
+    margin-bottom: 30px;
+}
+
+
+header h1 {
+    font-size: 32px;
+    margin-bottom: 8px;
+}
+
+
+header p {
+    color: #666b78;
+}
+
+
+.page-section {
+    display: none;
+}
+
+
+.active-section {
+    display: block;
+}
+
+
+/* Cards */
+
+.card {
+    background: white;
+    padding: 25px;
+    border-radius: 14px;
+    margin-bottom: 22px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+}
+
+
+.card h2 {
+    margin-bottom: 10px;
+}
+
+
+.card p {
+    color: #666b78;
+    line-height: 1.5;
+    margin-bottom: 18px;
+}
+
+
+.section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+}
+
+
+/* Inputs */
+
+input,
+textarea {
+    width: 100%;
+    border: 1px solid #d8dbe4;
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 8px;
+    margin-bottom: 18px;
+    outline: none;
+}
+
+
+input:focus,
+textarea:focus {
+    border-color: #555b7d;
+}
+
+
+textarea {
+    min-height: 130px;
+    resize: vertical;
+}
+
+
+label {
+    display: block;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+
+/* Buttons */
+
+.primary-button {
+    border: none;
+    background: #181c2e;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+
+.primary-button:hover {
+    opacity: 0.9;
+}
+
+
+.secondary-button {
+    border: 1px solid #d8dbe4;
+    background: white;
+    padding: 9px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+
+.secondary-button:hover {
+    background: #f1f2f6;
+}
+
+
+/* Messages */
+
+.message {
+    margin-top: 16px;
+    line-height: 1.5;
+}
+
+
+.success {
+    color: #177245;
+}
+
+
+.error {
+    color: #b42318;
+}
+
+
+.muted {
+    color: #888d99;
+}
+
+
+.hidden {
+    display: none;
+}
+
+
+/* Documents */
+
+.document-item {
+    background: #f7f8fb;
+    padding: 14px;
+    border-radius: 8px;
+    margin-top: 10px;
+}
+
+
+/* AI answer */
+
+.answer-output {
+    white-space: pre-wrap;
+    line-height: 1.7;
+}
+
+
+.sources {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #eceef3;
+    color: #666b78;
+}
+
+
+/* Quiz */
+
+.quiz-question {
+    background: white;
+    padding: 24px;
+    border-radius: 14px;
+    margin-bottom: 18px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+}
+
+
+.quiz-question h3 {
+    margin-bottom: 18px;
+}
+
+
+.quiz-option {
+    display: block;
+    background: #f7f8fb;
+    padding: 12px;
+    margin: 9px 0;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+
+.quiz-option input {
+    width: auto;
+    margin: 0 10px 0 0;
+}
+
+
+.quiz-result {
+    margin-top: 15px;
+    padding: 14px;
+    border-radius: 8px;
+    background: #f7f8fb;
+    line-height: 1.5;
+}
+
+
+.score-card {
+    background: white;
+    border-radius: 14px;
+    padding: 25px;
+    margin-bottom: 20px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+}
+
+
+/* Flashcards */
+
+.flashcard-grid {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(240px, 1fr)
+    );
+    gap: 18px;
+}
+
+
+.flashcard {
+    background: white;
+    min-height: 190px;
+    padding: 25px;
+    border-radius: 14px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+
+.flashcard:hover {
+    transform: translateY(-2px);
+}
+
+
+.flashcard-label {
+    color: #888d99;
+    font-size: 12px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+}
+
+
+.flashcard-text {
+    font-size: 18px;
+    line-height: 1.5;
+}
+
+
+/* Progress */
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(
+        4,
+        1fr
+    );
+    gap: 16px;
+    margin-bottom: 22px;
+}
+
+
+.stat-card {
+    background: white;
+    padding: 22px;
+    border-radius: 12px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+}
+
+
+.stat-card span {
+    display: block;
+    color: #737887;
+    margin-bottom: 10px;
+}
+
+
+.stat-card strong {
+    font-size: 23px;
+}
+
+
+.progress-row {
+    margin-bottom: 18px;
+}
+
+
+.progress-heading {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 7px;
+}
+
+
+.progress-bar {
+    height: 10px;
+    background: #eceef3;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+
+.progress-fill {
+    height: 100%;
+    background: #181c2e;
+    border-radius: 20px;
+}
+
+
+.history-item {
+    padding: 14px 0;
+    border-bottom: 1px solid #eceef3;
+    display: flex;
+    justify-content: space-between;
+}
+
+
+.history-item:last-child {
+    border-bottom: none;
+}
+
+
+/* Mobile */
+
+@media (max-width: 800px) {
+
+    .app-container {
+        display: block;
+    }
+
+
+    .sidebar {
+        width: 100%;
+        min-height: auto;
+    }
+
+
+    nav {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+
+    .main-content {
+        padding: 20px;
+    }
+
+
+    .stats-grid {
+        grid-template-columns: repeat(
+            2,
+            1fr
+        );
+    }
+}
+
+
+@media (max-width: 500px) {
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
