@@ -34,9 +34,7 @@ client = Client(
 # -------------------------
 
 ASK_MODEL = "llama3.2:3b"
-
 GENERATION_MODEL = "llama3.2:1b"
-
 EMBEDDING_MODEL = "embeddinggemma"
 
 
@@ -44,21 +42,12 @@ EMBEDDING_MODEL = "embeddinggemma"
 # Frontend setup
 # -------------------------
 
-BASE_DIR = (
-    Path(__file__)
-    .resolve()
-    .parent
-)
-
-FRONTEND_DIR = (
-        BASE_DIR / "frontend"
-)
+BASE_DIR = Path(__file__).resolve().parent
+FRONTEND_DIR = BASE_DIR / "frontend"
 
 app.mount(
     "/static",
-    StaticFiles(
-        directory=FRONTEND_DIR
-    ),
+    StaticFiles(directory=FRONTEND_DIR),
     name="static"
 )
 
@@ -75,11 +64,8 @@ create_tables()
 # -------------------------
 
 uploaded_chunks = []
-
 chunk_embeddings = []
-
 chunk_sources = []
-
 uploaded_documents = []
 
 latest_quiz = None
@@ -91,16 +77,10 @@ latest_quiz = None
 
 def load_saved_study_data():
 
-    saved_documents = (
-        get_saved_documents()
-    )
-
-    saved_chunks = (
-        get_saved_document_chunks()
-    )
+    saved_documents = get_saved_documents()
+    saved_chunks = get_saved_document_chunks()
 
     for document in saved_documents:
-
         uploaded_documents.append(
             document["filename"]
         )
@@ -128,12 +108,10 @@ load_saved_study_data()
 # -------------------------
 
 class QuestionRequest(BaseModel):
-
     question: str
 
 
 class QuizRequest(BaseModel):
-
     topic: str
 
     number_of_questions: int = Field(
@@ -147,27 +125,43 @@ class QuizQuestion(BaseModel):
 
     question: str
 
-    options: list[str]
+    options: list[str] = Field(
+        min_length=4,
+        max_length=4
+    )
 
-    correct_answer: str
+    # 0 = first option
+    # 1 = second option
+    # 2 = third option
+    # 3 = fourth option
+    correct_option_index: int = Field(
+        ge=0,
+        le=3
+    )
 
     explanation: str
 
 
 class QuizResponse(BaseModel):
-
     topic: str
-
     questions: list[QuizQuestion]
 
 
-class QuizSubmission(BaseModel):
+class PublicQuizQuestion(BaseModel):
+    question: str
+    options: list[str]
 
+
+class PublicQuizResponse(BaseModel):
+    topic: str
+    questions: list[PublicQuizQuestion]
+
+
+class QuizSubmission(BaseModel):
     answers: list[str]
 
 
 class FlashcardRequest(BaseModel):
-
     topic: str
 
     number_of_flashcards: int = Field(
@@ -178,16 +172,12 @@ class FlashcardRequest(BaseModel):
 
 
 class Flashcard(BaseModel):
-
     front: str
-
     back: str
 
 
 class FlashcardResponse(BaseModel):
-
     topic: str
-
     flashcards: list[Flashcard]
 
 
@@ -225,26 +215,19 @@ def split_text(
     words = text.split()
 
     chunks = []
-
     start = 0
 
     while start < len(words):
 
-        end = (
-                start + chunk_size
-        )
+        end = start + chunk_size
 
         chunk = " ".join(
             words[start:end]
         )
 
-        chunks.append(
-            chunk
-        )
+        chunks.append(chunk)
 
-        start += (
-                chunk_size - overlap
-        )
+        start += chunk_size - overlap
 
     return chunks
 
@@ -276,12 +259,7 @@ def cosine_similarity(
         )
     )
 
-    if (
-            magnitude1 == 0
-            or
-            magnitude2 == 0
-    ):
-
+    if magnitude1 == 0 or magnitude2 == 0:
         return 0
 
     return (
@@ -336,6 +314,45 @@ def find_relevant_chunks(
     ]
 
 
+def quiz_is_valid(
+        quiz,
+        requested_number
+):
+
+    # Must contain exactly the requested
+    # number of questions
+    if len(quiz.questions) != requested_number:
+        return False
+
+    for question in quiz.questions:
+
+        # Must contain four options
+        if len(question.options) != 4:
+            return False
+
+        # Remove whitespace and ignore
+        # capitalisation when checking duplicates
+        normalised_options = [
+            option.strip().lower()
+            for option in question.options
+        ]
+
+        # All four options must be different
+        if len(set(normalised_options)) != 4:
+            return False
+
+        # Questions/options cannot be empty
+        if not question.question.strip():
+            return False
+
+        for option in question.options:
+
+            if not option.strip():
+                return False
+
+    return True
+
+
 # -------------------------
 # Upload PDFs
 # -------------------------
@@ -365,8 +382,7 @@ async def upload_pdf(
 
         return {
             "error":
-                "This document has already "
-                "been uploaded."
+                "This document has already been uploaded."
         }
 
     contents = await file.read()
@@ -388,31 +404,20 @@ async def upload_pdf(
 
     for page in reader.pages:
 
-        page_text = (
-            page.extract_text()
-        )
+        page_text = page.extract_text()
 
         if page_text:
-
-            text += (
-                    page_text
-                    +
-                    "\n"
-            )
+            text += page_text + "\n"
 
     if not text.strip():
 
         return {
             "error":
-                "No text could be extracted "
-                "from this PDF."
+                "No text could be extracted from this PDF."
         }
 
-    new_chunks = split_text(
-        text
-    )
+    new_chunks = split_text(text)
 
-    # Generate embeddings once
     embedding_response = client.embed(
         model=EMBEDDING_MODEL,
         input=new_chunks
@@ -422,8 +427,6 @@ async def upload_pdf(
         embedding_response.embeddings
     )
 
-    # Save chunks and embeddings
-    # permanently in SQLite
     saved = save_document(
         filename=file.filename,
         chunks=new_chunks,
@@ -434,12 +437,9 @@ async def upload_pdf(
 
         return {
             "error":
-                "This document has already "
-                "been saved."
+                "This document has already been saved."
         }
 
-    # Add the same information
-    # to memory for immediate use
     uploaded_chunks.extend(
         new_chunks
     )
@@ -518,18 +518,12 @@ def ask_question(
     )
 
     context_parts = []
-
     sources = []
 
     for score, index in top_results:
 
-        source = (
-            chunk_sources[index]
-        )
-
-        chunk = (
-            uploaded_chunks[index]
-        )
+        source = chunk_sources[index]
+        chunk = uploaded_chunks[index]
 
         context_parts.append(
             f"Source: {source}\n{chunk}"
@@ -640,57 +634,99 @@ Topic:
 
 Create exactly {request.number_of_questions} questions.
 
-Rules:
+IMPORTANT RULES:
 
-- Every question must have exactly 4 options.
-- Only one option should be correct.
-- Include the correct answer.
-- Include one short explanation.
+- Every question must have exactly 4 answer options.
+- All 4 options must be different.
+- Never repeat an option.
+- There must be exactly one correct option.
+- correct_option_index must be a number from 0 to 3.
+- 0 means the first option.
+- 1 means the second option.
+- 2 means the third option.
+- 3 means the fourth option.
+- The explanation must agree with the correct option.
 - Keep questions and explanations concise.
-- Do not use information outside the notes.
+- Use only information contained in the notes.
 
 STUDY NOTES:
 
 {context}
 """
 
-    response = client.chat(
-        model=GENERATION_MODEL,
-        messages=[
-            {
-                "role":
-                    "system",
+    # Try twice in case the smaller
+    # local model produces invalid options
+    for attempt in range(2):
 
-                "content":
-                    "You generate concise educational "
-                    "multiple-choice quizzes using only "
-                    "the supplied study material."
-            },
-            {
-                "role":
-                    "user",
+        response = client.chat(
+            model=GENERATION_MODEL,
+            messages=[
+                {
+                    "role":
+                        "system",
 
-                "content":
-                    prompt
+                    "content":
+                        "You generate accurate educational "
+                        "multiple-choice quizzes using only "
+                        "the supplied study material."
+                },
+                {
+                    "role":
+                        "user",
+
+                    "content":
+                        prompt
+                }
+            ],
+            format=(
+                QuizResponse.model_json_schema()
+            ),
+            options={
+                "temperature": 0
             }
-        ],
-        format=(
-            QuizResponse.model_json_schema()
-        ),
-        options={
-            "temperature": 0
-        }
-    )
-
-    quiz = (
-        QuizResponse.model_validate_json(
-            response.message.content
         )
+
+        full_quiz = (
+            QuizResponse.model_validate_json(
+                response.message.content
+            )
+        )
+
+        if quiz_is_valid(
+                full_quiz,
+                request.number_of_questions
+        ):
+            break
+
+    else:
+
+        return {
+            "error":
+                "The AI could not create a valid quiz. "
+                "Please try again."
+        }
+
+    # Store the answer key only
+    # on the backend
+    latest_quiz = full_quiz
+
+    # Send only questions and options
+    # to the browser
+    public_questions = []
+
+    for question in full_quiz.questions:
+
+        public_questions.append(
+            PublicQuizQuestion(
+                question=question.question,
+                options=question.options
+            )
+        )
+
+    return PublicQuizResponse(
+        topic=full_quiz.topic,
+        questions=public_questions
     )
-
-    latest_quiz = quiz
-
-    return quiz
 
 
 # -------------------------
@@ -722,7 +758,6 @@ def submit_quiz(
         }
 
     score = 0
-
     results = []
 
     for index, question in enumerate(
@@ -733,19 +768,21 @@ def submit_quiz(
             submission.answers[index]
         )
 
+        # Backend works out the actual
+        # correct option text
+        correct_answer = (
+            question.options[
+                question.correct_option_index
+            ]
+        )
+
         is_correct = (
-                student_answer
-                .strip()
-                .lower()
+                student_answer.strip().lower()
                 ==
-                question
-                .correct_answer
-                .strip()
-                .lower()
+                correct_answer.strip().lower()
         )
 
         if is_correct:
-
             score += 1
 
         results.append({
@@ -756,7 +793,7 @@ def submit_quiz(
                 student_answer,
 
             "correct_answer":
-                question.correct_answer,
+                correct_answer,
 
             "correct":
                 is_correct,
@@ -810,30 +847,17 @@ def submit_quiz(
 @app.get("/progress")
 def get_progress():
 
-    quiz_history = (
-        get_quiz_results()
-    )
+    quiz_history = get_quiz_results()
 
     if not quiz_history:
 
         return {
-            "total_quizzes":
-                0,
-
-            "average_percentage":
-                0,
-
-            "weakest_topic":
-                None,
-
-            "strongest_topic":
-                None,
-
-            "topic_progress":
-                [],
-
-            "quiz_history":
-                []
+            "total_quizzes": 0,
+            "average_percentage": 0,
+            "weakest_topic": None,
+            "strongest_topic": None,
+            "topic_progress": [],
+            "quiz_history": []
         }
 
     total_percentage = sum(
@@ -851,16 +875,10 @@ def get_progress():
 
     for result in quiz_history:
 
-        topic = (
-            result["topic"]
-        )
-
-        percentage = (
-            result["percentage"]
-        )
+        topic = result["topic"]
+        percentage = result["percentage"]
 
         if topic not in topic_scores:
-
             topic_scores[topic] = []
 
         topic_scores[
