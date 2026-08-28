@@ -1,60 +1,144 @@
 let currentQuiz = null;
 
 
-// -------------------------
-// Navigation
-// -------------------------
+// =========================
+// LANDING PAGE
+// =========================
+
+const useNowButton =
+    document.getElementById(
+        "use-now-button"
+    );
+
+const landingPage =
+    document.getElementById(
+        "landing-page"
+    );
+
+const studyApp =
+    document.getElementById(
+        "study-app"
+    );
+
+
+useNowButton.addEventListener(
+    "click",
+    () => {
+
+        landingPage.style.display =
+            "none";
+
+        studyApp.classList.remove(
+            "app-hidden"
+        );
+
+        window.scrollTo(
+            0,
+            0
+        );
+
+        loadDocuments();
+
+    }
+);
+
+
+
+// =========================
+// NAVIGATION
+// =========================
 
 const navigationButtons =
-    document.querySelectorAll(".nav-button");
+    document.querySelectorAll(
+        ".nav-button"
+    );
 
 const sections =
-    document.querySelectorAll(".page-section");
+    document.querySelectorAll(
+        ".page-section"
+    );
 
 
 navigationButtons.forEach(button => {
 
-    button.addEventListener("click", () => {
+    button.addEventListener(
+        "click",
+        () => {
 
-        navigationButtons.forEach(nav => {
-            nav.classList.remove("active");
-        });
+            navigationButtons.forEach(
+                nav => {
 
-        sections.forEach(section => {
-            section.classList.remove(
-                "active-section"
+                    nav.classList.remove(
+                        "active"
+                    );
+
+                }
             );
-        });
-
-        button.classList.add("active");
-
-        const target =
-            button.dataset.section;
-
-        document
-            .getElementById(target)
-            .classList.add("active-section");
 
 
-        if (target === "progress-section") {
-            loadProgress();
+            sections.forEach(
+                section => {
+
+                    section.classList.remove(
+                        "active-section"
+                    );
+
+                }
+            );
+
+
+            button.classList.add(
+                "active"
+            );
+
+
+            const target =
+                button.dataset.section;
+
+
+            document
+                .getElementById(target)
+                .classList.add(
+                    "active-section"
+                );
+
+
+            if (
+                target
+                ===
+                "progress-section"
+            ) {
+
+                loadProgress();
+
+            }
+
+
+            if (
+                target
+                ===
+                "upload-section"
+            ) {
+
+                loadDocuments();
+
+            }
+
         }
-
-        if (target === "upload-section") {
-            loadDocuments();
-        }
-
-    });
+    );
 
 });
 
 
-// -------------------------
-// Upload PDF
-// -------------------------
+
+// =========================
+// UPLOAD PDF
+// =========================
 
 document
-    .getElementById("upload-button")
+    .getElementById(
+        "upload-button"
+    )
     .addEventListener(
         "click",
         uploadPDF
@@ -83,11 +167,13 @@ async function uploadPDF() {
             "message error";
 
         return;
+
     }
 
 
     const formData =
         new FormData();
+
 
     formData.append(
         "file",
@@ -104,13 +190,15 @@ async function uploadPDF() {
 
     try {
 
-        const response = await fetch(
-            "/upload",
-            {
-                method: "POST",
-                body: formData
-            }
-        );
+        const response =
+            await fetch(
+                "/upload",
+                {
+                    method: "POST",
+                    body: formData
+                }
+            );
+
 
         const data =
             await response.json();
@@ -125,6 +213,7 @@ async function uploadPDF() {
                 "message error";
 
             return;
+
         }
 
 
@@ -134,7 +223,9 @@ async function uploadPDF() {
         message.className =
             "message success";
 
+
         fileInput.value = "";
+
 
         loadDocuments();
 
@@ -151,12 +242,15 @@ async function uploadPDF() {
 }
 
 
-// -------------------------
-// Documents
-// -------------------------
+
+// =========================
+// DOCUMENTS
+// =========================
 
 document
-    .getElementById("refresh-documents")
+    .getElementById(
+        "refresh-documents"
+    )
     .addEventListener(
         "click",
         loadDocuments
@@ -174,13 +268,20 @@ async function loadDocuments() {
     try {
 
         const response =
-            await fetch("/documents");
+            await fetch(
+                "/documents"
+            );
+
 
         const data =
             await response.json();
 
 
-        if (data.documents.length === 0) {
+        if (
+            data.documents.length
+            ===
+            0
+        ) {
 
             container.innerHTML = `
                 <p class="muted">
@@ -189,16 +290,19 @@ async function loadDocuments() {
             `;
 
             return;
+
         }
 
 
         container.innerHTML =
             data.documents
-                .map(documentName => `
-                    <div class="document-item">
-                        ${escapeHTML(documentName)}
-                    </div>
-                `)
+                .map(
+                    documentName => `
+                        <div class="document-item">
+                            ${escapeHTML(documentName)}
+                        </div>
+                    `
+                )
                 .join("");
 
     } catch (error) {
@@ -214,12 +318,15 @@ async function loadDocuments() {
 }
 
 
-// -------------------------
-// Ask AI
-// -------------------------
+
+// =========================
+// ASK AI
+// =========================
 
 document
-    .getElementById("ask-button")
+    .getElementById(
+        "ask-button"
+    )
     .addEventListener(
         "click",
         askQuestion
@@ -259,6 +366,7 @@ async function askQuestion() {
         );
 
         return;
+
     }
 
 
@@ -266,8 +374,10 @@ async function askQuestion() {
         "hidden"
     );
 
+
     output.textContent =
         "Thinking...";
+
 
     sources.textContent = "";
 
@@ -279,13 +389,17 @@ async function askQuestion() {
                 "/ask",
                 {
                     method: "POST",
+
                     headers: {
                         "Content-Type":
                             "application/json"
                     },
-                    body: JSON.stringify({
-                        question: question
-                    })
+
+                    body:
+                        JSON.stringify({
+                            question:
+                                question
+                        })
                 }
             );
 
@@ -300,6 +414,7 @@ async function askQuestion() {
                 data.error;
 
             return;
+
         }
 
 
@@ -308,13 +423,15 @@ async function askQuestion() {
 
 
         if (
-            data.sources &&
+            data.sources
+            &&
             data.sources.length > 0
         ) {
 
             sources.textContent =
                 "Sources: "
-                + data.sources.join(", ");
+                +
+                data.sources.join(", ");
 
         }
 
@@ -328,12 +445,15 @@ async function askQuestion() {
 }
 
 
-// -------------------------
-// Generate Quiz
-// -------------------------
+
+// =========================
+// GENERATE QUIZ
+// =========================
 
 document
-    .getElementById("generate-quiz")
+    .getElementById(
+        "generate-quiz"
+    )
     .addEventListener(
         "click",
         generateQuiz
@@ -343,16 +463,23 @@ document
 async function generateQuiz() {
 
     const topic =
-        document.getElementById(
-            "quiz-topic"
-        ).value.trim();
+        document
+            .getElementById(
+                "quiz-topic"
+            )
+            .value
+            .trim();
+
 
     const numberOfQuestions =
         Number(
-            document.getElementById(
-                "quiz-count"
-            ).value
+            document
+                .getElementById(
+                    "quiz-count"
+                )
+                .value
         );
+
 
     const container =
         document.getElementById(
@@ -367,12 +494,14 @@ async function generateQuiz() {
         );
 
         return;
+
     }
 
 
     container.classList.remove(
         "hidden"
     );
+
 
     container.innerHTML = `
         <div class="card">
@@ -388,15 +517,20 @@ async function generateQuiz() {
                 "/quiz",
                 {
                     method: "POST",
+
                     headers: {
                         "Content-Type":
                             "application/json"
                     },
-                    body: JSON.stringify({
-                        topic: topic,
-                        number_of_questions:
-                            numberOfQuestions
-                    })
+
+                    body:
+                        JSON.stringify({
+                            topic:
+                                topic,
+
+                            number_of_questions:
+                                numberOfQuestions
+                        })
                 }
             );
 
@@ -414,12 +548,17 @@ async function generateQuiz() {
             `;
 
             return;
+
         }
 
 
-        currentQuiz = data;
+        currentQuiz =
+            data;
 
-        displayQuiz(data);
+
+        displayQuiz(
+            data
+        );
 
     } catch (error) {
 
@@ -435,6 +574,11 @@ async function generateQuiz() {
 }
 
 
+
+// =========================
+// DISPLAY QUIZ
+// =========================
+
 function displayQuiz(quiz) {
 
     const container =
@@ -445,26 +589,38 @@ function displayQuiz(quiz) {
 
     let html = `
         <div class="card">
+
             <h2>
-                ${escapeHTML(quiz.topic)} Quiz
+                ${escapeHTML(quiz.topic)}
+                Quiz
             </h2>
 
             <p>
-                Select one answer for each question.
+                Select one answer
+                for each question.
             </p>
+
         </div>
     `;
 
 
     quiz.questions.forEach(
-        (question, questionIndex) => {
+        (
+            question,
+            questionIndex
+        ) => {
 
             html += `
-                <div class="quiz-question">
+                <div
+                    class="quiz-question"
+                    id="quiz-question-${questionIndex}"
+                >
 
                     <h3>
                         ${questionIndex + 1}.
-                        ${escapeHTML(question.question)}
+                        ${escapeHTML(
+                            question.question
+                        )}
                     </h3>
             `;
 
@@ -473,11 +629,15 @@ function displayQuiz(quiz) {
                 option => {
 
                     html += `
-                        <label class="quiz-option">
+                        <label
+                            class="quiz-option"
+                        >
 
                             <input
                                 type="radio"
+
                                 name="question-${questionIndex}"
+
                                 value="${escapeAttribute(option)}"
                             >
 
@@ -504,7 +664,10 @@ function displayQuiz(quiz) {
 
     html += `
         <button
+            id="submit-quiz-button"
+
             class="primary-button"
+
             onclick="submitQuiz()"
         >
             Submit Quiz
@@ -512,19 +675,23 @@ function displayQuiz(quiz) {
     `;
 
 
-    container.innerHTML = html;
+    container.innerHTML =
+        html;
 
 }
 
 
-// -------------------------
-// Submit Quiz
-// -------------------------
+
+// =========================
+// SUBMIT QUIZ
+// =========================
 
 async function submitQuiz() {
 
     if (!currentQuiz) {
+
         return;
+
     }
 
 
@@ -550,6 +717,7 @@ async function submitQuiz() {
             );
 
             return;
+
         }
 
 
@@ -566,14 +734,19 @@ async function submitQuiz() {
             await fetch(
                 "/quiz/submit",
                 {
-                    method: "POST",
+                    method:
+                        "POST",
+
                     headers: {
                         "Content-Type":
                             "application/json"
                     },
-                    body: JSON.stringify({
-                        answers: answers
-                    })
+
+                    body:
+                        JSON.stringify({
+                            answers:
+                                answers
+                        })
                 }
             );
 
@@ -584,13 +757,18 @@ async function submitQuiz() {
 
         if (data.error) {
 
-            alert(data.error);
+            alert(
+                data.error
+            );
 
             return;
+
         }
 
 
-        showQuizResults(data);
+        showQuizResults(
+            data
+        );
 
     } catch (error) {
 
@@ -603,6 +781,11 @@ async function submitQuiz() {
 }
 
 
+
+// =========================
+// SHOW QUIZ RESULTS
+// =========================
+
 function showQuizResults(data) {
 
     const container =
@@ -611,10 +794,24 @@ function showQuizResults(data) {
         );
 
 
+    const oldScoreCard =
+        container.querySelector(
+            ".score-card"
+        );
+
+
+    if (oldScoreCard) {
+
+        oldScoreCard.remove();
+
+    }
+
+
     const scoreCard =
         document.createElement(
             "div"
         );
+
 
     scoreCard.className =
         "score-card";
@@ -647,12 +844,27 @@ function showQuizResults(data) {
 
 
     data.results.forEach(
-        (result, index) => {
+        (
+            result,
+            index
+        ) => {
+
+            const questionBox =
+                document.getElementById(
+                    `quiz-question-${index}`
+                );
+
 
             const resultContainer =
                 document.getElementById(
                     `result-${index}`
                 );
+
+
+            questionBox.classList.remove(
+                "correct-question",
+                "wrong-question"
+            );
 
 
             resultContainer.className =
@@ -661,9 +873,14 @@ function showQuizResults(data) {
 
             if (result.correct) {
 
+                questionBox.classList.add(
+                    "correct-question"
+                );
+
+
                 resultContainer.innerHTML = `
                     <strong>
-                        Correct
+                        ✓ Correct
                     </strong>
 
                     <p>
@@ -675,10 +892,22 @@ function showQuizResults(data) {
 
             } else {
 
+                questionBox.classList.add(
+                    "wrong-question"
+                );
+
+
                 resultContainer.innerHTML = `
                     <strong>
-                        Incorrect
+                        ✕ Incorrect
                     </strong>
+
+                    <p>
+                        Your answer:
+                        ${escapeHTML(
+                            result.your_answer
+                        )}
+                    </p>
 
                     <p>
                         Correct answer:
@@ -699,15 +928,54 @@ function showQuizResults(data) {
         }
     );
 
+
+    const submitButton =
+        document.getElementById(
+            "submit-quiz-button"
+        );
+
+
+    if (submitButton) {
+
+        submitButton.disabled =
+            true;
+
+        submitButton.textContent =
+            "Quiz Submitted";
+
+    }
+
+
+    const quizInputs =
+        document.querySelectorAll(
+            '.quiz-question input[type="radio"]'
+        );
+
+
+    quizInputs.forEach(
+        input => {
+
+            input.disabled =
+                true;
+
+        }
+    );
+
+
+    loadProgress();
+
 }
 
 
-// -------------------------
-// Flashcards
-// -------------------------
+
+// =========================
+// FLASHCARDS
+// =========================
 
 document
-    .getElementById("generate-flashcards")
+    .getElementById(
+        "generate-flashcards"
+    )
     .addEventListener(
         "click",
         generateFlashcards
@@ -717,16 +985,23 @@ document
 async function generateFlashcards() {
 
     const topic =
-        document.getElementById(
-            "flashcard-topic"
-        ).value.trim();
+        document
+            .getElementById(
+                "flashcard-topic"
+            )
+            .value
+            .trim();
+
 
     const count =
         Number(
-            document.getElementById(
-                "flashcard-count"
-            ).value
+            document
+                .getElementById(
+                    "flashcard-count"
+                )
+                .value
         );
+
 
     const container =
         document.getElementById(
@@ -741,6 +1016,7 @@ async function generateFlashcards() {
         );
 
         return;
+
     }
 
 
@@ -757,16 +1033,22 @@ async function generateFlashcards() {
             await fetch(
                 "/flashcards",
                 {
-                    method: "POST",
+                    method:
+                        "POST",
+
                     headers: {
                         "Content-Type":
                             "application/json"
                     },
-                    body: JSON.stringify({
-                        topic: topic,
-                        number_of_flashcards:
-                            count
-                    })
+
+                    body:
+                        JSON.stringify({
+                            topic:
+                                topic,
+
+                            number_of_flashcards:
+                                count
+                        })
                 }
             );
 
@@ -779,11 +1061,14 @@ async function generateFlashcards() {
 
             container.innerHTML = `
                 <div class="card error">
-                    ${escapeHTML(data.error)}
+                    ${escapeHTML(
+                        data.error
+                    )}
                 </div>
             `;
 
             return;
+
         }
 
 
@@ -805,6 +1090,11 @@ async function generateFlashcards() {
 }
 
 
+
+// =========================
+// DISPLAY FLASHCARDS
+// =========================
+
 function displayFlashcards(
     flashcards
 ) {
@@ -815,7 +1105,8 @@ function displayFlashcards(
         );
 
 
-    container.innerHTML = "";
+    container.innerHTML =
+        "";
 
 
     flashcards.forEach(
@@ -826,6 +1117,7 @@ function displayFlashcards(
                     "div"
                 );
 
+
             card.className =
                 "flashcard";
 
@@ -833,8 +1125,10 @@ function displayFlashcards(
             card.dataset.front =
                 flashcard.front;
 
+
             card.dataset.back =
                 flashcard.back;
+
 
             card.dataset.showingBack =
                 "false";
@@ -855,7 +1149,10 @@ function displayFlashcards(
 
             card.addEventListener(
                 "click",
-                () => flipFlashcard(card)
+                () =>
+                    flipFlashcard(
+                        card
+                    )
             );
 
 
@@ -869,11 +1166,19 @@ function displayFlashcards(
 }
 
 
-function flipFlashcard(card) {
+
+// =========================
+// FLIP FLASHCARD
+// =========================
+
+function flipFlashcard(
+    card
+) {
 
     const showingBack =
         card.dataset.showingBack
-        === "true";
+        ===
+        "true";
 
 
     if (showingBack) {
@@ -889,6 +1194,7 @@ function flipFlashcard(card) {
                 )}
             </div>
         `;
+
 
         card.dataset.showingBack =
             "false";
@@ -907,6 +1213,7 @@ function flipFlashcard(card) {
             </div>
         `;
 
+
         card.dataset.showingBack =
             "true";
 
@@ -915,12 +1222,15 @@ function flipFlashcard(card) {
 }
 
 
-// -------------------------
-// Progress
-// -------------------------
+
+// =========================
+// PROGRESS
+// =========================
 
 document
-    .getElementById("refresh-progress")
+    .getElementById(
+        "refresh-progress"
+    )
     .addEventListener(
         "click",
         loadProgress
@@ -932,7 +1242,10 @@ async function loadProgress() {
     try {
 
         const response =
-            await fetch("/progress");
+            await fetch(
+                "/progress"
+            );
+
 
         const data =
             await response.json();
@@ -960,7 +1273,8 @@ async function loadProgress() {
             )
             .textContent =
                 data.strongest_topic
-                || "-";
+                ||
+                "-";
 
 
         document
@@ -969,7 +1283,8 @@ async function loadProgress() {
             )
             .textContent =
                 data.weakest_topic
-                || "-";
+                ||
+                "-";
 
 
         displayTopicProgress(
@@ -993,6 +1308,11 @@ async function loadProgress() {
 }
 
 
+
+// =========================
+// TOPIC PROGRESS
+// =========================
+
 function displayTopicProgress(
     topics
 ) {
@@ -1013,47 +1333,65 @@ function displayTopicProgress(
         `;
 
         return;
+
     }
 
 
     container.innerHTML =
         topics
-            .map(topic => `
+            .map(
+                topic => `
 
-                <div class="progress-row">
-
-                    <div class="progress-heading">
-
-                        <span>
-                            ${escapeHTML(
-                                topic.topic
-                            )}
-                        </span>
-
-                        <span>
-                            ${topic.average_score}%
-                        </span>
-
-                    </div>
-
-                    <div class="progress-bar">
+                    <div
+                        class="progress-row"
+                    >
 
                         <div
-                            class="progress-fill"
-                            style="width:
-                            ${topic.average_score}%"
+                            class="progress-heading"
                         >
+
+                            <span>
+                                ${escapeHTML(
+                                    topic.topic
+                                )}
+                            </span>
+
+                            <span>
+                                ${topic.average_score}%
+                            </span>
+
+                        </div>
+
+
+                        <div
+                            class="progress-bar"
+                        >
+
+                            <div
+                                class="progress-fill"
+
+                                style="
+                                    width:
+                                    ${topic.average_score}%;
+                                "
+                            >
+                            </div>
+
                         </div>
 
                     </div>
 
-                </div>
-
-            `)
+                `
+            )
             .join("");
 
 }
 
+
+
+// =========================
+// QUIZ HISTORY
+// =========================
 
 function displayQuizHistory(
     history
@@ -1074,81 +1412,117 @@ function displayQuizHistory(
         `;
 
         return;
+
     }
 
 
     container.innerHTML =
         history
-            .map(item => `
+            .map(
+                item => `
 
-                <div class="history-item">
+                    <div
+                        class="history-item"
+                    >
 
-                    <div>
+                        <div>
+
+                            <strong>
+                                ${escapeHTML(
+                                    item.topic
+                                )}
+                            </strong>
+
+                            <div
+                                class="muted"
+                            >
+                                ${formatDate(
+                                    item.completed_at
+                                )}
+                            </div>
+
+                        </div>
+
                         <strong>
-                            ${escapeHTML(
-                                item.topic
-                            )}
+                            ${item.percentage}%
                         </strong>
 
-                        <div class="muted">
-                            ${formatDate(
-                                item.completed_at
-                            )}
-                        </div>
                     </div>
 
-                    <strong>
-                        ${item.percentage}%
-                    </strong>
-
-                </div>
-
-            `)
+                `
+            )
             .join("");
 
 }
 
 
-// -------------------------
-// Utility functions
-// -------------------------
 
-function escapeHTML(value) {
+// =========================
+// UTILITY FUNCTIONS
+// =========================
+
+function escapeHTML(
+    value
+) {
 
     const div =
         document.createElement(
             "div"
         );
 
+
     div.textContent =
         String(value);
+
 
     return div.innerHTML;
 
 }
 
 
-function escapeAttribute(value) {
+function escapeAttribute(
+    value
+) {
 
     return String(value)
-        .replaceAll("&", "&amp;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;");
+
+        .replaceAll(
+            "&",
+            "&amp;"
+        )
+
+        .replaceAll(
+            '"',
+            "&quot;"
+        )
+
+        .replaceAll(
+            "<",
+            "&lt;"
+        )
+
+        .replaceAll(
+            ">",
+            "&gt;"
+        );
 
 }
 
 
-function formatDate(value) {
+function formatDate(
+    value
+) {
 
     const date =
         new Date(value);
+
 
     return date.toLocaleString();
 
 }
 
 
-// Load initial data
+// Load document information
+// in the background
 
 loadDocuments();

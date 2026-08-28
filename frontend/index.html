@@ -19,14 +19,113 @@
 
 <body>
 
-<div class="app-container">
+
+<!-- =========================
+     LANDING PAGE
+========================= -->
+
+<section id="landing-page" class="landing-page">
+
+    <div class="landing-background-circle circle-one"></div>
+    <div class="landing-background-circle circle-two"></div>
+
+    <div class="landing-content">
+
+        <div class="landing-badge">
+            AI-powered learning
+        </div>
+
+        <h1>
+            AI Study Assistant
+        </h1>
+
+        <p class="landing-subtitle">
+            Turn your study notes into answers,
+            quizzes and flashcards — all powered
+            by AI.
+        </p>
+
+        <button
+                id="use-now-button"
+                class="use-now-button"
+        >
+            Use Now
+        </button>
+
+        <div class="landing-features">
+
+            <div class="landing-feature">
+                <span class="feature-icon">
+                    📄
+                </span>
+
+                <div>
+                    <strong>Upload Notes</strong>
+                    <p>
+                        Add your own PDF study material.
+                    </p>
+                </div>
+            </div>
+
+
+            <div class="landing-feature">
+                <span class="feature-icon">
+                    ✨
+                </span>
+
+                <div>
+                    <strong>Ask AI</strong>
+                    <p>
+                        Get answers based on your notes.
+                    </p>
+                </div>
+            </div>
+
+
+            <div class="landing-feature">
+                <span class="feature-icon">
+                    ✓
+                </span>
+
+                <div>
+                    <strong>Test Yourself</strong>
+                    <p>
+                        Generate quizzes and flashcards.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================
+     MAIN APPLICATION
+========================= -->
+
+<div
+        id="study-app"
+        class="app-container app-hidden"
+>
 
     <aside class="sidebar">
 
         <div class="logo">
-            <h2>StudyAI</h2>
-            <p>Your AI study assistant</p>
+
+            <h2>
+                StudyAI
+            </h2>
+
+            <p>
+                Your AI study assistant
+            </p>
+
         </div>
+
 
         <nav>
 
@@ -74,7 +173,9 @@
 
         <header>
 
-            <h1>AI Study Assistant</h1>
+            <h1>
+                AI Study Assistant
+            </h1>
 
             <p>
                 Upload your notes and study using
@@ -84,7 +185,9 @@
         </header>
 
 
-        <!-- Upload section -->
+        <!-- =========================
+             UPLOAD
+        ========================= -->
 
         <section
                 id="upload-section"
@@ -93,7 +196,9 @@
 
             <div class="card">
 
-                <h2>Upload Study Notes</h2>
+                <h2>
+                    Upload Study Notes
+                </h2>
 
                 <p>
                     Upload a PDF and the AI will use
@@ -125,7 +230,9 @@
 
                 <div class="section-heading">
 
-                    <h2>Uploaded Documents</h2>
+                    <h2>
+                        Uploaded Documents
+                    </h2>
 
                     <button
                             id="refresh-documents"
@@ -135,6 +242,7 @@
                     </button>
 
                 </div>
+
 
                 <div id="document-list">
 
@@ -149,7 +257,10 @@
         </section>
 
 
-        <!-- Ask AI section -->
+
+        <!-- =========================
+             ASK AI
+        ========================= -->
 
         <section
                 id="ask-section"
@@ -158,7 +269,9 @@
 
             <div class="card">
 
-                <h2>Ask Your Notes</h2>
+                <h2>
+                    Ask Your Notes
+                </h2>
 
                 <p>
                     Ask a question and the AI will
@@ -186,7 +299,9 @@
                     class="card hidden"
             >
 
-                <h2>Answer</h2>
+                <h2>
+                    Answer
+                </h2>
 
                 <div
                         id="answer-output"
@@ -203,7 +318,10 @@
         </section>
 
 
-        <!-- Quiz section -->
+
+        <!-- =========================
+             QUIZ
+        ========================= -->
 
         <section
                 id="quiz-section"
@@ -212,7 +330,9 @@
 
             <div class="card">
 
-                <h2>Generate Quiz</h2>
+                <h2>
+                    Generate Quiz
+                </h2>
 
                 <label for="quiz-topic">
                     Topic
@@ -254,7 +374,10 @@
         </section>
 
 
-        <!-- Flashcards section -->
+
+        <!-- =========================
+             FLASHCARDS
+        ========================= -->
 
         <section
                 id="flashcard-section"
@@ -263,7 +386,9 @@
 
             <div class="card">
 
-                <h2>Generate Flashcards</h2>
+                <h2>
+                    Generate Flashcards
+                </h2>
 
                 <label for="flashcard-topic">
                     Topic
@@ -305,7 +430,10 @@
         </section>
 
 
-        <!-- Progress section -->
+
+        <!-- =========================
+             PROGRESS
+        ========================= -->
 
         <section
                 id="progress-section"
@@ -314,7 +442,9 @@
 
             <div class="section-heading">
 
-                <h2>Your Progress</h2>
+                <h2>
+                    Your Progress
+                </h2>
 
                 <button
                         id="refresh-progress"
@@ -330,7 +460,9 @@
 
                 <div class="stat-card">
 
-                    <span>Total Quizzes</span>
+                    <span>
+                        Total Quizzes
+                    </span>
 
                     <strong id="total-quizzes">
                         0
@@ -341,7 +473,9 @@
 
                 <div class="stat-card">
 
-                    <span>Average Score</span>
+                    <span>
+                        Average Score
+                    </span>
 
                     <strong id="average-score">
                         0%
@@ -352,7 +486,9 @@
 
                 <div class="stat-card">
 
-                    <span>Strongest Topic</span>
+                    <span>
+                        Strongest Topic
+                    </span>
 
                     <strong id="strongest-topic">
                         -
@@ -363,7 +499,9 @@
 
                 <div class="stat-card">
 
-                    <span>Weakest Topic</span>
+                    <span>
+                        Weakest Topic
+                    </span>
 
                     <strong id="weakest-topic">
                         -
@@ -376,7 +514,9 @@
 
             <div class="card">
 
-                <h2>Topic Performance</h2>
+                <h2>
+                    Topic Performance
+                </h2>
 
                 <div id="topic-progress">
 
@@ -391,7 +531,9 @@
 
             <div class="card">
 
-                <h2>Quiz History</h2>
+                <h2>
+                    Quiz History
+                </h2>
 
                 <div id="quiz-history">
 

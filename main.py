@@ -375,7 +375,7 @@ async def upload_pdf(
 
         return {
             "error":
-                "Please upload a PDF file."
+                "A PDF file needs to be uploaded."
         }
 
     if file.filename in uploaded_documents:
@@ -543,7 +543,7 @@ def ask_question(
 Use ONLY the study notes below to answer the student's question.
 
 If the answer cannot be found in the notes, say:
-"I could not find this information in the uploaded notes."
+"This information is not found in the uploaded notes."
 
 Keep the answer clear and concise.
 
