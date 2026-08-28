@@ -2,12 +2,48 @@ let currentQuiz = null;
 
 
 // =========================
+// BUTTON LOADING HELPER
+// =========================
+
+function startLoading(
+    button,
+    loadingText
+) {
+
+    button.dataset.originalText =
+        button.textContent;
+
+    button.disabled = true;
+
+    button.textContent =
+        loadingText;
+
+}
+
+
+function stopLoading(button) {
+
+    button.disabled = false;
+
+    button.textContent =
+        button.dataset.originalText;
+
+}
+
+
+
+// =========================
 // LANDING PAGE
 // =========================
 
 const useNowButton =
     document.getElementById(
         "use-now-button"
+    );
+
+const backHomeButton =
+    document.getElementById(
+        "back-home-button"
     );
 
 const landingPage =
@@ -43,6 +79,26 @@ useNowButton.addEventListener(
 );
 
 
+backHomeButton.addEventListener(
+    "click",
+    () => {
+
+        studyApp.classList.add(
+            "app-hidden"
+        );
+
+        landingPage.style.display =
+            "flex";
+
+        window.scrollTo(
+            0,
+            0
+        );
+
+    }
+);
+
+
 
 // =========================
 // NAVIGATION
@@ -59,75 +115,79 @@ const sections =
     );
 
 
-navigationButtons.forEach(button => {
+navigationButtons.forEach(
+    button => {
 
-    button.addEventListener(
-        "click",
-        () => {
+        button.addEventListener(
+            "click",
+            () => {
 
-            navigationButtons.forEach(
-                nav => {
+                navigationButtons.forEach(
+                    nav => {
 
-                    nav.classList.remove(
-                        "active"
-                    );
+                        nav.classList.remove(
+                            "active"
+                        );
 
-                }
-            );
-
-
-            sections.forEach(
-                section => {
-
-                    section.classList.remove(
-                        "active-section"
-                    );
-
-                }
-            );
-
-
-            button.classList.add(
-                "active"
-            );
-
-
-            const target =
-                button.dataset.section;
-
-
-            document
-                .getElementById(target)
-                .classList.add(
-                    "active-section"
+                    }
                 );
 
 
-            if (
-                target
-                ===
-                "progress-section"
-            ) {
+                sections.forEach(
+                    section => {
 
-                loadProgress();
+                        section.classList.remove(
+                            "active-section"
+                        );
+
+                    }
+                );
+
+
+                button.classList.add(
+                    "active"
+                );
+
+
+                const target =
+                    button.dataset.section;
+
+
+                document
+                    .getElementById(
+                        target
+                    )
+                    .classList.add(
+                        "active-section"
+                    );
+
+
+                if (
+                    target
+                    ===
+                    "progress-section"
+                ) {
+
+                    loadProgress();
+
+                }
+
+
+                if (
+                    target
+                    ===
+                    "upload-section"
+                ) {
+
+                    loadDocuments();
+
+                }
 
             }
+        );
 
-
-            if (
-                target
-                ===
-                "upload-section"
-            ) {
-
-                loadDocuments();
-
-            }
-
-        }
-    );
-
-});
+    }
+);
 
 
 
@@ -135,14 +195,16 @@ navigationButtons.forEach(button => {
 // UPLOAD PDF
 // =========================
 
-document
-    .getElementById(
+const uploadButton =
+    document.getElementById(
         "upload-button"
-    )
-    .addEventListener(
-        "click",
-        uploadPDF
     );
+
+
+uploadButton.addEventListener(
+    "click",
+    uploadPDF
+);
 
 
 async function uploadPDF() {
@@ -182,10 +244,16 @@ async function uploadPDF() {
 
 
     message.textContent =
-        "Uploading and processing PDF...";
+        "Processing your PDF...";
 
     message.className =
         "message";
+
+
+    startLoading(
+        uploadButton,
+        "Uploading..."
+    );
 
 
     try {
@@ -227,7 +295,7 @@ async function uploadPDF() {
         fileInput.value = "";
 
 
-        loadDocuments();
+        await loadDocuments();
 
     } catch (error) {
 
@@ -236,6 +304,12 @@ async function uploadPDF() {
 
         message.className =
             "message error";
+
+    } finally {
+
+        stopLoading(
+            uploadButton
+        );
 
     }
 
@@ -298,9 +372,15 @@ async function loadDocuments() {
             data.documents
                 .map(
                     documentName => `
+
                         <div class="document-item">
-                            ${escapeHTML(documentName)}
+
+                            ${escapeHTML(
+                                documentName
+                            )}
+
                         </div>
+
                     `
                 )
                 .join("");
@@ -323,14 +403,16 @@ async function loadDocuments() {
 // ASK AI
 // =========================
 
-document
-    .getElementById(
+const askButton =
+    document.getElementById(
         "ask-button"
-    )
-    .addEventListener(
-        "click",
-        askQuestion
     );
+
+
+askButton.addEventListener(
+    "click",
+    askQuestion
+);
 
 
 async function askQuestion() {
@@ -380,6 +462,12 @@ async function askQuestion() {
 
 
     sources.textContent = "";
+
+
+    startLoading(
+        askButton,
+        "Thinking..."
+    );
 
 
     try {
@@ -440,6 +528,12 @@ async function askQuestion() {
         output.textContent =
             "Something went wrong while generating the answer.";
 
+    } finally {
+
+        stopLoading(
+            askButton
+        );
+
     }
 
 }
@@ -450,14 +544,16 @@ async function askQuestion() {
 // GENERATE QUIZ
 // =========================
 
-document
-    .getElementById(
+const generateQuizButton =
+    document.getElementById(
         "generate-quiz"
-    )
-    .addEventListener(
-        "click",
-        generateQuiz
     );
+
+
+generateQuizButton.addEventListener(
+    "click",
+    generateQuiz
+);
 
 
 async function generateQuiz() {
@@ -505,9 +601,15 @@ async function generateQuiz() {
 
     container.innerHTML = `
         <div class="card">
-            Generating quiz...
+            Generating your quiz...
         </div>
     `;
+
+
+    startLoading(
+        generateQuizButton,
+        "Generating Quiz..."
+    );
 
 
     try {
@@ -543,7 +645,9 @@ async function generateQuiz() {
 
             container.innerHTML = `
                 <div class="card error">
-                    ${escapeHTML(data.error)}
+                    ${escapeHTML(
+                        data.error
+                    )}
                 </div>
             `;
 
@@ -569,6 +673,12 @@ async function generateQuiz() {
             </div>
         `;
 
+    } finally {
+
+        stopLoading(
+            generateQuizButton
+        );
+
     }
 
 }
@@ -579,7 +689,9 @@ async function generateQuiz() {
 // DISPLAY QUIZ
 // =========================
 
-function displayQuiz(quiz) {
+function displayQuiz(
+    quiz
+) {
 
     const container =
         document.getElementById(
@@ -591,7 +703,9 @@ function displayQuiz(quiz) {
         <div class="card">
 
             <h2>
-                ${escapeHTML(quiz.topic)}
+                ${escapeHTML(
+                    quiz.topic
+                )}
                 Quiz
             </h2>
 
@@ -617,10 +731,13 @@ function displayQuiz(quiz) {
                 >
 
                     <h3>
+
                         ${questionIndex + 1}.
+
                         ${escapeHTML(
                             question.question
                         )}
+
                     </h3>
             `;
 
@@ -638,10 +755,14 @@ function displayQuiz(quiz) {
 
                                 name="question-${questionIndex}"
 
-                                value="${escapeAttribute(option)}"
+                                value="${escapeAttribute(
+                                    option
+                                )}"
                             >
 
-                            ${escapeHTML(option)}
+                            ${escapeHTML(
+                                option
+                            )}
 
                         </label>
                     `;
@@ -728,14 +849,29 @@ async function submitQuiz() {
     }
 
 
+    const submitButton =
+        document.getElementById(
+            "submit-quiz-button"
+        );
+
+
+    startLoading(
+        submitButton,
+        "Submitting..."
+    );
+
+
+    let submittedSuccessfully =
+        false;
+
+
     try {
 
         const response =
             await fetch(
                 "/quiz/submit",
                 {
-                    method:
-                        "POST",
+                    method: "POST",
 
                     headers: {
                         "Content-Type":
@@ -766,6 +902,10 @@ async function submitQuiz() {
         }
 
 
+        submittedSuccessfully =
+            true;
+
+
         showQuizResults(
             data
         );
@@ -776,6 +916,18 @@ async function submitQuiz() {
             "Something went wrong while submitting the quiz."
         );
 
+    } finally {
+
+        if (
+            !submittedSuccessfully
+        ) {
+
+            stopLoading(
+                submitButton
+            );
+
+        }
+
     }
 
 }
@@ -783,10 +935,12 @@ async function submitQuiz() {
 
 
 // =========================
-// SHOW QUIZ RESULTS
+// QUIZ RESULTS
 // =========================
 
-function showQuizResults(data) {
+function showQuizResults(
+    data
+) {
 
     const container =
         document.getElementById(
@@ -824,6 +978,7 @@ function showQuizResults(data) {
 
         <p>
             Score:
+
             <strong>
                 ${data.score}/${data.total}
             </strong>
@@ -831,6 +986,7 @@ function showQuizResults(data) {
 
         <p>
             Percentage:
+
             <strong>
                 ${data.percentage}%
             </strong>
@@ -904,6 +1060,7 @@ function showQuizResults(data) {
 
                     <p>
                         Your answer:
+
                         ${escapeHTML(
                             result.your_answer
                         )}
@@ -911,6 +1068,7 @@ function showQuizResults(data) {
 
                     <p>
                         Correct answer:
+
                         ${escapeHTML(
                             result.correct_answer
                         )}
@@ -972,14 +1130,16 @@ function showQuizResults(data) {
 // FLASHCARDS
 // =========================
 
-document
-    .getElementById(
+const flashcardButton =
+    document.getElementById(
         "generate-flashcards"
-    )
-    .addEventListener(
-        "click",
-        generateFlashcards
     );
+
+
+flashcardButton.addEventListener(
+    "click",
+    generateFlashcards
+);
 
 
 async function generateFlashcards() {
@@ -1022,9 +1182,15 @@ async function generateFlashcards() {
 
     container.innerHTML = `
         <div class="card">
-            Generating flashcards...
+            Generating your flashcards...
         </div>
     `;
+
+
+    startLoading(
+        flashcardButton,
+        "Generating..."
+    );
 
 
     try {
@@ -1033,8 +1199,7 @@ async function generateFlashcards() {
             await fetch(
                 "/flashcards",
                 {
-                    method:
-                        "POST",
+                    method: "POST",
 
                     headers: {
                         "Content-Type":
@@ -1061,9 +1226,11 @@ async function generateFlashcards() {
 
             container.innerHTML = `
                 <div class="card error">
+
                     ${escapeHTML(
                         data.error
                     )}
+
                 </div>
             `;
 
@@ -1084,6 +1251,12 @@ async function generateFlashcards() {
                 generating flashcards.
             </div>
         `;
+
+    } finally {
+
+        stopLoading(
+            flashcardButton
+        );
 
     }
 
@@ -1140,19 +1313,24 @@ function displayFlashcards(
                 </div>
 
                 <div class="flashcard-text">
+
                     ${escapeHTML(
                         flashcard.front
                     )}
+
                 </div>
             `;
 
 
             card.addEventListener(
                 "click",
-                () =>
+                () => {
+
                     flipFlashcard(
                         card
-                    )
+                    );
+
+                }
             );
 
 
@@ -1189,9 +1367,11 @@ function flipFlashcard(
             </div>
 
             <div class="flashcard-text">
+
                 ${escapeHTML(
                     card.dataset.front
                 )}
+
             </div>
         `;
 
@@ -1207,9 +1387,11 @@ function flipFlashcard(
             </div>
 
             <div class="flashcard-text">
+
                 ${escapeHTML(
                     card.dataset.back
                 )}
+
             </div>
         `;
 
@@ -1327,8 +1509,10 @@ function displayTopicProgress(
 
         container.innerHTML = `
             <p class="muted">
+
                 Complete quizzes to
                 see your progress.
+
             </p>
         `;
 
@@ -1342,30 +1526,28 @@ function displayTopicProgress(
             .map(
                 topic => `
 
-                    <div
-                        class="progress-row"
-                    >
+                    <div class="progress-row">
 
-                        <div
-                            class="progress-heading"
-                        >
+                        <div class="progress-heading">
 
                             <span>
+
                                 ${escapeHTML(
                                     topic.topic
                                 )}
+
                             </span>
 
                             <span>
+
                                 ${topic.average_score}%
+
                             </span>
 
                         </div>
 
 
-                        <div
-                            class="progress-bar"
-                        >
+                        <div class="progress-bar">
 
                             <div
                                 class="progress-fill"
@@ -1421,24 +1603,24 @@ function displayQuizHistory(
             .map(
                 item => `
 
-                    <div
-                        class="history-item"
-                    >
+                    <div class="history-item">
 
                         <div>
 
                             <strong>
+
                                 ${escapeHTML(
                                     item.topic
                                 )}
+
                             </strong>
 
-                            <div
-                                class="muted"
-                            >
+                            <div class="muted">
+
                                 ${formatDate(
                                     item.completed_at
                                 )}
+
                             </div>
 
                         </div>
@@ -1522,7 +1704,9 @@ function formatDate(
 }
 
 
-// Load document information
-// in the background
+
+// =========================
+// INITIAL LOAD
+// =========================
 
 loadDocuments();
