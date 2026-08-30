@@ -11,6 +11,7 @@ The AI runs locally using **Ollama**, meaning no paid AI API is required.
 ## Demo
 
 ### Home Page
+<img width="1469" height="774" alt="Screenshot 2026-08-30 at 19 08 49" src="https://github.com/user-attachments/assets/753885d5-a8cc-479e-b3cd-1f03f0ec4379" /> 
 
 
 ### Ask AI
