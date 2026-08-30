@@ -13,8 +13,8 @@ The AI runs locally using **Ollama**, meaning no paid AI API is required.
 ### Home Page
 <img width="1469" height="774" alt="Screenshot 2026-08-30 at 19 08 49" src="https://github.com/user-attachments/assets/753885d5-a8cc-479e-b3cd-1f03f0ec4379" /> 
 
-
 ### Ask AI
+<img width="1469" height="774" alt="Screenshot 2026-08-30 at 19 09 10" src="https://github.com/user-attachments/assets/47691b2a-119e-4ca1-a81f-c434a39e8bf7" />
 
 
 ### AI Quiz
@@ -22,6 +22,8 @@ The AI runs locally using **Ollama**, meaning no paid AI API is required.
 
 
 ### Progress Tracking
+<img width="1469" height="774" alt="Screenshot 2026-08-30 at 19 10 17" src="https://github.com/user-attachments/assets/451b3075-4b10-4ead-99b2-37dbf81eb853" />
+
 
 
 ---
