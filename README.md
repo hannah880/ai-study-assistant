@@ -1,8 +1,8 @@
 # AI Study Assistant
 
-AI-powered study assistant built with **Python, FastAPI, local LLMs and Retrieval-Augmented Generation (RAG)**.
+ This is an AI-powered study assistant built with **Python, FastAPI, local LLMs and Retrieval-Augmented Generation (RAG)**.
 
-Users can upload their own PDF study notes and use them to ask questions, generate quizzes, create flashcards and track their learning progress.
+This is where users can study by uploading a pdf of their study notes and ask ai questions, do quizzes and flashcards based off what they have uploaded. Progress of the user will also be saved.
 
 The AI runs locally using **Ollama**, meaning no paid AI API is required.
 
@@ -12,36 +12,33 @@ The AI runs locally using **Ollama**, meaning no paid AI API is required.
 
 ### Home Page
 
-> Screenshot coming soon
 
 ### Ask AI
 
-> Screenshot coming soon
 
 ### AI Quiz
 
-> Screenshot coming soon
+
 
 ### Progress Tracking
 
-> Screenshot coming soon
 
 ---
 
 ## Features
 
 - Upload PDF study notes
-- Automatically extract and process text from PDFs
+- Extracts and processes text from PDFs
 - Generate vector embeddings using EmbeddingGemma
 - Retrieve relevant information using semantic search and cosine similarity
-- Ask AI questions based on uploaded study notes
+- Ask AI questions based on what has been uploaded
 - Display the source document used for answers
-- Generate multiple-choice quizzes from selected topics
-- Automatically mark quiz answers
+- Multiple-choice quizzes from selected topics are generated
+- Marking of quiz answers
 - Show explanations after submission
-- Highlight correct answers in green and incorrect answers in red
+- Correct answers will be in green and incorrect answers in red
 - Generate interactive AI flashcards
-- Track quiz scores and performance
+- Quiz scores and performance are tracked
 - Identify strongest and weakest topics
 - Store quiz history using SQLite
 - Persist uploaded document embeddings between application restarts
@@ -86,30 +83,6 @@ The AI runs locally using **Ollama**, meaning no paid AI API is required.
 ## How It Works
 
 The application uses a Retrieval-Augmented Generation pipeline:
-
-```text
-PDF Study Notes
-        ↓
-Text Extraction
-        ↓
-Text Chunking
-        ↓
-EmbeddingGemma
-        ↓
-Vector Embeddings
-        ↓
-SQLite Storage
-        ↓
-User Question / Topic
-        ↓
-Semantic Similarity Search
-        ↓
-Relevant Note Chunks
-        ↓
-Local Llama Model
-        ↓
-Answer / Quiz / Flashcards
-```
 
 When a user asks a question:
 
@@ -182,19 +155,15 @@ All AI processing runs locally through Ollama.
 
 ```text
 ai-study-assistant/
-│
 ├── main.py
 ├── database.py
 ├── requirements.txt
 ├── README.md
 ├── .gitignore
-│
 └── frontend/
     ├── index.html
     ├── styles.css
     └── app.js
-```
-
 ---
 
 ## What I Learned
@@ -202,7 +171,7 @@ ai-study-assistant/
 This project helped me gain experience with:
 
 - Building REST APIs using FastAPI
-- Implementing Retrieval-Augmented Generation
+- RAG
 - Working with vector embeddings and semantic search
 - Integrating local large language models
 - Processing PDF documents
