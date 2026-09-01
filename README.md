@@ -191,9 +191,9 @@ This project helped me gain experience with:
 - Accounts for different users
 - Separate progress tracking for multiple users
 - Support for additional file formats
-- Spaced-repetition flashcards
+- Spaced-repetition flashcards (such as ANKI)
 - More detailed learning analytics
-- Add automated tests
+- Add written tests
 
 ---
 
