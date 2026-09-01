@@ -2,7 +2,8 @@
 
  This is an AI-powered study assistant built with **Python, FastAPI, local LLMs and Retrieval-Augmented Generation (RAG)**.
 
-This is where users can study by uploading a pdf of their study notes and ask ai questions, do quizzes and flashcards based off what they have uploaded. Progress of the user will also be saved.
+This is where users can study by uploading a pdf of their study notes and ask ai questions, do quizzes and flashcards based off what they have uploaded. Progress of the user will also be saved. 
+I have created this as i'm a student and this would be a beneficial tool to help with my studies.
 
 The AI runs locally using **Ollama**, meaning no paid AI API is required.
 
@@ -16,10 +17,8 @@ The AI runs locally using **Ollama**, meaning no paid AI API is required.
 ### Ask AI
 <img width="1469" height="774" alt="Screenshot 2026-08-30 at 19 09 10" src="https://github.com/user-attachments/assets/47691b2a-119e-4ca1-a81f-c434a39e8bf7" />
 
-
 ### AI Quiz
-
-
+<img width="1469" height="774" alt="Screenshot 2026-09-01 at 12 14 52" src="https://github.com/user-attachments/assets/073135db-55a8-4821-98e7-fa8fb82b2e85" />
 
 ### Progress Tracking
 <img width="1469" height="774" alt="Screenshot 2026-08-30 at 19 10 17" src="https://github.com/user-attachments/assets/451b3075-4b10-4ead-99b2-37dbf81eb853" />
@@ -89,19 +88,19 @@ The application uses a Retrieval-Augmented Generation pipeline:
 
 When a user asks a question:
 
-1. The question is converted into a vector embedding.
+1. The questions are converted into a vector embedding.
 2. The application compares it with embeddings from the uploaded notes.
-3. Cosine similarity is used to identify the most relevant chunks.
-4. Only the relevant study material is passed to the language model.
-5. The model generates an answer based on the retrieved notes.
+3. Cosine similarity is used to identify the most relevant parts.
+4. Only the relevant study material is passed onto the language model.
+5. The model generates an answer based on the extracted notes.
 
-This allows the AI to answer questions using the student's own material rather than relying only on general model knowledge.
+Uploading documents allows the AI to answer questions using the student's own material rather than relying only on other materials.
 
 ---
 
 ## Quiz System
 
-The quiz feature uses retrieved study-note content to generate multiple-choice questions.
+The quiz feature uses retrieved study-note content to generate mcq questions.
 
 The application:
 
@@ -136,19 +135,19 @@ This allows students to identify areas that may need more revision.
 
 ## Local AI Models
 
-The project uses different local models for different tasks:
+This project uses different local models for different tasks:
 
 **Llama 3.2 3B**
 
-Used for question answering where higher-quality responses are preferred.
+Used for question answering where we want higher-quality responses.
 
 **Llama 3.2 1B**
 
-Used for quiz and flashcard generation to improve response speed.
+Used for quiz and flashcard generation to make responses more speedy
 
 **EmbeddingGemma**
 
-Used to generate vector embeddings for semantic retrieval.
+Used to make vector embeddings for semantic retrieval.
 
 All AI processing runs locally through Ollama.
 
@@ -169,7 +168,7 @@ ai-study-assistant/
     └── app.js
 ---
 
-## What I Learned
+## What I  have Learnt
 
 This project helped me gain experience with:
 
@@ -179,24 +178,22 @@ This project helped me gain experience with:
 - Integrating local large language models
 - Processing PDF documents
 - Designing persistent storage with SQLite
-- Connecting a JavaScript frontend to a Python backend
+- Using a JavaScript frontend and connecting it to a Python backend
 - Using Pydantic for structured AI output
-- Validating AI-generated content
 - Managing application state and persistent data
-- Git and GitHub version control
-- Debugging and improving AI-generated outputs
+- Git and GitHub 
+- Debugging, understanding and improving AI-generated outputs
 
 ---
 
 ## Future Improvements
 
-- User accounts
+- Accounts for different users
 - Separate progress tracking for multiple users
 - Support for additional file formats
-- Spaced-repetition flashcards
+- Spaced-repetition flashcards (like ANKI)
 - More detailed learning analytics
-- Improved document management
-- Cloud deployment
+- Writing tests added
 
 ---
 
