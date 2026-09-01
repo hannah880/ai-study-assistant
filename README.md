@@ -165,9 +165,10 @@ ai-study-assistant/
 └── frontend/
     ├── index.html
     ├── styles.css
-    └── app.js ```
----
+    └── app.js 
+```
 
+```markdown
 ## What I  have Learnt
 
 This project helped me gain experience with:
