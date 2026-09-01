@@ -197,11 +197,9 @@ This project helped me gain experience with:
 
 ---
 
+
 <details>
-
 <summary><strong>Run Locally</strong></summary>
-
-<br>
 
 The application uses local Ollama models, so Ollama and the required models must be installed to use the full AI functionality.
 
@@ -209,9 +207,6 @@ The application uses local Ollama models, so Ollama and the required models must
 
 ```bash
 git clone <repository-url>
-```
-
-```bash
 cd ai-study-assistant
 ```
 
