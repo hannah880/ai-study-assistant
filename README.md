@@ -165,7 +165,7 @@ ai-study-assistant/
 └── frontend/
     ├── index.html
     ├── styles.css
-    └── app.js
+    └── app.js ```
 ---
 
 ## What I  have Learnt
