@@ -165,11 +165,10 @@ ai-study-assistant/
 └── frontend/
     ├── index.html
     ├── styles.css
-    └── app.js 
+    └── app.js
 ```
 
-```markdown
-## What I  have Learnt
+## What I Have Learnt
 
 This project helped me gain experience with:
 
@@ -182,7 +181,7 @@ This project helped me gain experience with:
 - Using a JavaScript frontend and connecting it to a Python backend
 - Using Pydantic for structured AI output
 - Managing application state and persistent data
-- Git and GitHub 
+- Git and GitHub
 - Debugging, understanding and improving AI-generated outputs
 
 ---
@@ -192,12 +191,11 @@ This project helped me gain experience with:
 - Accounts for different users
 - Separate progress tracking for multiple users
 - Support for additional file formats
-- Spaced-repetition flashcards (like ANKI)
+- Spaced-repetition flashcards
 - More detailed learning analytics
-- Writing tests added
+- Add automated tests
 
 ---
-
 
 <details>
 <summary><strong>Run Locally</strong></summary>
